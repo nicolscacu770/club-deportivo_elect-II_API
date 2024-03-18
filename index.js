@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 
+console.log('servidor a punto de iniciar');
+
 const router = require('./routers/index.router');
 
 const PORT = 3001;
