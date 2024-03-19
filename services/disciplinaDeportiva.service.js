@@ -66,6 +66,19 @@ module.exports = {
         } catch (err) {
             return res.status(500).json({ state: false, message: 'Disciplina deportiva no eliminado'});
         }
-    }
+    },
 
+
+    findAfiliados : async (req, res) => {
+        try {
+            const afiliados = await prisma.deportista.findMany({
+                where: {
+                    disciplinaId: parseInt( req.params.id )
+                }
+            });
+            return res.status(200).json({state: true, msg: "Recuperar Todos los registros de afiliados", "data": afiliados});
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
+        }
+    }
 } 
