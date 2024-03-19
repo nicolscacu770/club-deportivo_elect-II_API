@@ -88,7 +88,7 @@ module.exports = {
                 where: {
                     id: parseInt( req.body.id ) //id del deportista que viene en el req.body
                 },
-                disciplinaId: parseInt( req.params.id )
+                data: { disciplinaId: parseInt( req.params.id ) }
             });
             return res.status(200).json({ state: true, data: deportistaAfiliado });
         } catch (err) {
