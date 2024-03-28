@@ -75,7 +75,15 @@ module.exports = {
                     disciplinaId: parseInt( req.params.id )
                 }
             });
-            return res.status(200).json({state: true, msg: "Recuperar Todos los registros de afiliados a ", "data": afiliados});
+            const nombreDisciplina = await prisma.disciplina_deportiva.findFirst({
+                select:{
+                    nombre: true
+                },
+                where: {
+                    id: parseInt( req.params.id )
+                }
+            });
+            return res.status(200).json({state: true, msg: `Recuperar Todos los registros de afiliados a ${nombreDisciplina.nombre}`, "data": afiliados});
         } catch (err) {
             return res.status(500).json({ message: err.message });
         }
@@ -83,14 +91,33 @@ module.exports = {
 
     findNoAfiliados : async (req, res) => {
         try {
+            const idDiscp = parseInt( req.params.id );
             const noAfiliados = await prisma.deportista.findMany({
                 where: {
-                    disciplinaId: {
-                        not: parseInt( req.params.id )
-                    }
+                    OR: [
+                        {
+                            NOT: {
+                                disciplinaId:  parseInt( idDiscp )
+                            }
+                        },
+                        {
+                            disciplinaId: {
+                                equals: null
+                            }
+                        }
+                    ]
+                    
                 }
             });
-            return res.status(200).json({state: true, msg: "Recuperar Todos los registros de no afiliados a ", "data": noAfiliados});
+            const nombreDisciplina = await prisma.disciplina_deportiva.findFirst({
+                select:{
+                    nombre: true
+                },
+                where: {
+                    id: parseInt( req.params.id )
+                }
+            });
+            return res.status(200).json({state: true, msg: `Recuperar Todos los registros de no afiliados a  ${nombreDisciplina.nombre}`, "data": noAfiliados});
         } catch (err) {
             return res.status(500).json({ message: err.message });
         }
@@ -102,7 +129,23 @@ module.exports = {
                 where: {
                     id: parseInt( req.body.id ) //id del deportista que viene en el req.body
                 },
-                data: { disciplinaId: parseInt( req.params.id ) }
+                data: { disciplinaId: parseInt( req.params.id ) } //id de la disciplina deportiva en la que se va a inscribir
+            });
+            return res.status(200).json({ state: true, data: deportistaAfiliado });
+        } catch (err) {
+            console.log(err.message);
+            return res.status(400).json({state: false, message: 'Deportista no afiliado correctamente' });
+        }
+    },
+    
+    deleteAfiliado: async (req, res) => {
+        try {
+            const deportistaAfiliado = await prisma.deportista.update({
+                where: {
+                    id: parseInt( req.body.id ), //id del deportista que viene en el req.body
+                    disciplinaId: parseInt( req.params.id ),
+                },
+                data: { disciplinaId: null }
             });
             return res.status(200).json({ state: true, data: deportistaAfiliado });
         } catch (err) {

@@ -103,16 +103,34 @@ module.exports = {
 
     addParticipante: async (req, res) => {
         try {
-            const deportistaAfiliado = await prisma.deportista.update({
-                where: {
-                    id: parseInt( req.body.id ) //id del deportista que viene en el req.body
-                },
-                data: { disciplinaId: parseInt( req.params.id ) }
+            req.body.deportistaId = parseInt(req.body.deportistaId);
+            console.log(req.body);
+            const deportistaAfiliado = await prisma.participacion_evento.create({
+                data: {
+                    ...req.body,
+                    eventoId: parseInt( req.params.id )
+                }
             });
             return res.status(200).json({ state: true, data: deportistaAfiliado });
         } catch (err) {
             console.log(err.message);
             return res.status(400).json({state: false, message: 'Deportista no afiliado correctamente' });
+        }
+    },
+
+    deleteParticipante: async (req, res) => {
+        try {
+            const deportistaAfiliado = await prisma.deportista.update({
+                where: {
+                    id: parseInt( req.body.id ), //id del deportista que viene en el req.body
+                    disciplinaId: parseInt( req.params.id ),
+                },
+                data: { disciplinaId: null }
+            });
+            return res.status(200).json({ state: true, data: deportistaAfiliado });
+        } catch (err) {
+            console.log(err.message);
+            return res.status(400).json({state: false, message: 'Deportista no se pudo desvincular correctamente' });
         }
     }
 } 
